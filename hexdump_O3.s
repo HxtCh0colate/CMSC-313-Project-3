@@ -15,7 +15,8 @@
 	.string	"   "
 .LC6:
 	.string	"|"
-	.text
+	.section	.text.startup,"ax",@progbits
+	.p2align 4
 	.globl	main
 	.type	main, @function
 main:
@@ -44,9 +45,9 @@ main:
 	cmpl	$2, %edi
 	je	.L2
 	movq	(%rsi), %rdx
-	movl	$.LC0, %esi
 	movq	stderr(%rip), %rdi
-	movl	$0, %eax
+	movl	$.LC0, %esi
+	xorl	%eax, %eax
 	call	fprintf
 	movl	$1, %eax
 .L1:
@@ -70,78 +71,81 @@ main:
 	.cfi_restore_state
 	movq	8(%rsi), %rdi
 	movl	$.LC1, %esi
+	xorl	%r12d, %r12d
 	call	fopen
-	movq	%rax, %r14
-	movl	$0, %r13d
+	movq	%rax, %r13
 	testq	%rax, %rax
-	jne	.L4
-	movl	$.LC2, %edi
-	call	perror
-	movl	$1, %eax
-	jmp	.L1
-.L5:
-	movl	$.LC5, %edi
-	movl	$0, %eax
-	call	printf
-.L6:
-	addq	$1, %rbx
-	cmpq	$16, %rbx
-	je	.L17
-.L7:
-	cmpq	%rbx, %rbp
-	jbe	.L5
-	movzbl	(%rsp,%rbx), %esi
-	movl	$.LC4, %edi
-	movl	$0, %eax
-	call	printf
-	jmp	.L6
-.L17:
-	movl	$124, %edi
-	call	putchar
-	call	__ctype_b_loc
-	movq	%rax, %r12
-	movq	%rsp, %rbx
-	leaq	0(%rbp,%rbx), %r15
-	jmp	.L10
-.L8:
-	movl	$46, %edi
-	call	putchar
-.L9:
-	addq	$1, %rbx
-	cmpq	%r15, %rbx
-	je	.L18
-.L10:
-	movzbl	(%rbx), %edi
-	movzbl	%dil, %edx
-	movq	(%r12), %rax
-	testb	$64, 1(%rax,%rdx,2)
-	je	.L8
-	movzbl	%dil, %edi
-	call	putchar
-	jmp	.L9
-.L18:
-	movl	$.LC6, %edi
-	call	puts
-	addq	%rbp, %r13
+	je	.L19
+	.p2align 4,,10
+	.p2align 3
 .L4:
-	movq	%r14, %rcx
+	movq	%r13, %rcx
 	movl	$16, %edx
 	movl	$1, %esi
 	movq	%rsp, %rdi
 	call	fread
 	movq	%rax, %rbp
 	testq	%rax, %rax
-	je	.L19
-	movl	%r13d, %esi
+	je	.L20
+	movl	%r12d, %esi
 	movl	$.LC3, %edi
-	movl	$0, %eax
+	xorl	%eax, %eax
+	xorl	%ebx, %ebx
 	call	printf
-	movl	$0, %ebx
 	jmp	.L7
-.L19:
-	movq	%r14, %rdi
+	.p2align 4,,10
+	.p2align 3
+.L22:
+	movzbl	(%rsp,%rbx), %esi
+	movl	$.LC4, %edi
+	xorl	%eax, %eax
+	addq	$1, %rbx
+	call	printf
+	cmpq	$16, %rbx
+	je	.L21
+.L7:
+	cmpq	%rbx, %rbp
+	ja	.L22
+	movl	$.LC5, %edi
+	xorl	%eax, %eax
+	addq	$1, %rbx
+	call	printf
+	cmpq	$16, %rbx
+	jne	.L7
+.L21:
+	movl	$124, %edi
+	movq	%rsp, %rbx
+	leaq	(%rsp,%rbp), %r14
+	call	putchar
+	call	__ctype_b_loc
+	movq	%rax, %r15
+	.p2align 4,,10
+	.p2align 3
+.L10:
+	movzbl	(%rbx), %edx
+	movq	(%r15), %rax
+	movq	%rdx, %rdi
+	testb	$64, 1(%rax,%rdx,2)
+	jne	.L17
+	movl	$46, %edi
+.L17:
+	call	putchar
+	addq	$1, %rbx
+	cmpq	%rbx, %r14
+	jne	.L10
+	movl	$.LC6, %edi
+	addq	%rbp, %r12
+	call	puts
+	jmp	.L4
+.L20:
+	movq	%r13, %rdi
 	call	fclose
-	movl	$0, %eax
+	xorl	%eax, %eax
+	jmp	.L1
+.L19:
+	movl	$.LC2, %edi
+	call	perror
+	movl	$1, %eax
 	jmp	.L1
 	.cfi_endproc
 .LFE24:

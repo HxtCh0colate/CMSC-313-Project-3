@@ -21,13 +21,13 @@ int main(int argc, char *argv[]) {
     unsigned long offset = 0;
 
     while ((bytesRead = fread(buffer, 1, BYTES_PER_LINE, file)) > 0) {
-        printf("%081x ", offset);
+        printf("%08x ", (unsigned int)offset); // to fix formatting
 
         for (size_t i = 0; i < BYTES_PER_LINE; i++) {
             if (i < bytesRead) {
                 printf("%02x ", buffer[i]);
             } else {
-                printf("  ");
+                printf("   ");
             }
         }
 
